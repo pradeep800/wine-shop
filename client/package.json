@@ -1,0 +1,38 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3008",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@next/font": "^13.2.1",
+    "@react-three/drei": "^9.56.28",
+    "@react-three/fiber": "^8.11.5",
+    "@stripe/react-stripe-js": "^1.16.5",
+    "@types/node": "18.14.2",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.35.0",
+    "eslint-config-next": "13.2.1",
+    "firebase": "^9.17.1",
+    "firebase-admin": "^11.5.0",
+    "next": "13.2.1",
+    "raw-body": "^2.5.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-error-boundary": "^3.1.4",
+    "react-firebase-hooks": "^5.1.1",
+    "stripe": "^11.13.0",
+    "typescript": "4.9.5",
+    "zustand": "^4.3.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7"
+  }
+}
