@@ -3,6 +3,7 @@ import { decodeJWT } from "@/lib/decodeJWT";
 import { runAsync, validateUser } from "@/lib/helper";
 import { stripe } from "@/lib/stripe";
 import { NextApiResponse } from "next";
+import Stripe from "stripe";
 import { MyApiRequest } from "../wallet";
 
 async function Success(req: MyApiRequest, res: NextApiResponse) {
@@ -14,9 +15,22 @@ async function Success(req: MyApiRequest, res: NextApiResponse) {
   const subscriptionPayment = await stripe.subscriptions.list({
     customer: customer.id,
   });
+  let payments: any[] = [];
+
+  for (const payment of successfulPayment.data) {
+    if (payment.status === "succeeded") {
+      let card = await stripe.paymentMethods.retrieve(
+        payment.payment_method as string
+      );
+
+      payments.push({ amount: payment.amount, ...card });
+    }
+  }
+
+  // return { amount: payment. ,};
 
   return {
-    payment: successfulPayment.data ?? [],
+    payments: payments ?? [],
     subscription: subscriptionPayment.data ?? [],
   };
 }

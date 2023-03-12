@@ -33,6 +33,7 @@ export function Nav() {
           uid,
           email,
           photoURL,
+          subscriptionStatus: "none",
         },
         { merge: true }
       );

@@ -13,13 +13,13 @@ interface Subscription {
   };
 }
 interface FetchInterface {
-  payment: Stripe.PaymentIntent[];
+  payments: Stripe.PaymentIntent[];
   subscription: Subscription[];
 }
 const fetcher = async (url: string) => {
-  let { payment, subscription } = await FetchFromAPI(url, { method: "GET" });
-  console.log(payment, subscription);
-  return { payment, subscription } as FetchInterface;
+  let { payments, subscription } = await FetchFromAPI(url, { method: "GET" });
+  console.log(payments, subscription);
+  return { payments, subscription } as FetchInterface;
 };
 export default function AuthKart() {
   return (
@@ -35,6 +35,13 @@ function Kart() {
     suspense: true,
   });
   const [input, setInput] = useState<string>("");
+  async function cancel() {
+    await FetchFromAPI("subscription/cancelPlan", {
+      body: {
+        subscriptionId: data.subscription[0].id as string,
+      },
+    });
+  }
   return (
     <div>
       <div>{data.subscription[0].quantity}</div>
@@ -63,6 +70,7 @@ function Kart() {
         />
         <button>save</button>
       </form>
+      <button onClick={cancel}>Kart</button>
     </div>
   );
   /* <div className="flex  h-[80vh] flex-col items-center">

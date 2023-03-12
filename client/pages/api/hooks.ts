@@ -2,34 +2,39 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import getRawBody from "raw-body";
+import { db } from "@/lib/firestore-sdk";
 type WebhookHandlers = {
-  "payment_intent.succeeded": (data: Stripe.PaymentIntent) => Promise<void>;
-  "payment_intent.payment_failed": (
-    data: Stripe.PaymentIntent
-  ) => Promise<void>;
   "customer.subscription.deleted": (data: Stripe.Subscription) => Promise<void>;
   "customer.subscription.created": (data: Stripe.Subscription) => Promise<void>;
-  "invoice.payment_succeeded": (data: Stripe.Invoice) => Promise<void>;
   "invoice.payment_failed": (data: Stripe.Invoice) => Promise<void>;
 };
 const webhookHandlers: WebhookHandlers = {
-  "payment_intent.succeeded": async (data: Stripe.PaymentIntent) => {
-    console.log("payment_intent.succeeded");
-  },
-  "payment_intent.payment_failed": async (data: Stripe.PaymentIntent) => {
-    console.log("payment_intent.payment_failed");
-  },
   "customer.subscription.deleted": async (data: Stripe.Subscription) => {
-    console.log("customer.subscription.deleted");
+    const customer = (await stripe.customers.retrieve(
+      data.customer as string
+    )) as Stripe.Customer;
+    await db.collection("users").doc(customer.metadata.firebaseUID).update({
+      subscriptionStatus: "none",
+    });
   },
   "customer.subscription.created": async (data: Stripe.Subscription) => {
-    console.log("customer.subscription.created");
+    const customer = (await stripe.customers.retrieve(
+      data.customer as string
+    )) as Stripe.Customer;
+    await db.collection("users").doc(customer.metadata.firebaseUID).update({
+      subscriptionStatus: "Active",
+    });
   },
-  "invoice.payment_succeeded": async (data: Stripe.Invoice) => {
-    console.log("invoice.payment_succeeded");
-  },
+
   "invoice.payment_failed": async (data: Stripe.Invoice) => {
-    console.log("invoice.payment_failed");
+    const customer = (await stripe.customers.retrieve(
+      data.customer as string
+    )) as Stripe.Customer;
+    const snapShot = await db
+      .collection("users")
+      .doc(customer.metadata.firebaseUID)
+      .get();
+    await snapShot.ref.update({ subscriptionStatus: "PAST_DUE" });
   },
 };
 
@@ -39,11 +44,13 @@ export default async function handleStripeWebhook(
 ) {
   const rawBody = await getRawBody(req);
   const signature = req.headers["stripe-signature"] as string;
+  console.log(signature);
   const event = stripe.webhooks.constructEvent(
     rawBody,
     signature,
     process.env.STRIPE_WEBHOOK_SECRET as string
   );
+  console.log(event.type);
   try {
     await webhookHandlers[event.type as keyof WebhookHandlers](
       event.data.object as any
@@ -51,7 +58,7 @@ export default async function handleStripeWebhook(
     res.send({ received: true });
   } catch (error: any) {
     console.log(error);
-    res.status(400).send("Webhook Error: " + error.message);
+    res.status(500).send("Webhook Error: " + error.message);
   }
 }
 

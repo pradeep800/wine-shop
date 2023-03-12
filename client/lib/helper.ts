@@ -13,6 +13,7 @@ export async function FetchFromAPI(
       id?: string;
       customer?: string;
       plan?: string;
+      subscriptionId?: string;
     };
   }
 ) {
