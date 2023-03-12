@@ -44,14 +44,14 @@ export default async function handleStripeWebhook(
 ) {
   const rawBody = await getRawBody(req);
   const signature = req.headers["stripe-signature"] as string;
-  console.log(signature);
-  const event = stripe.webhooks.constructEvent(
-    rawBody,
-    signature,
-    process.env.STRIPE_WEBHOOK_SECRET as string
-  );
-  console.log(event.type);
+  console.log(process.env.STRIPE_WEBHOOK_SECRET);
   try {
+    const event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET as string
+    );
+
     await webhookHandlers[event.type as keyof WebhookHandlers](
       event.data.object as any
     );
