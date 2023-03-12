@@ -1,10 +1,13 @@
 import { FetchFromAPI } from "@/lib/helper";
 import { useStore } from "@/lib/store";
 import { useStripe } from "@stripe/react-stripe-js";
-import { useState, useEffect } from "react";
-import Stripe from "stripe";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
+import useSWR, { mutate } from "swr";
 import AuthCheck from "@/components/authCheck";
+import Loading from "@/components/loading";
+import Link from "next/link";
+import EditSubscription from "@/components/editSubscription";
 interface CardInfo {
   last4: string;
   brand: string;
@@ -15,28 +18,68 @@ interface AllCardInfo {
   card: CardInfo;
   id: string;
 }
+interface SubInfo {
+  id: string;
+  object: {
+    [key: string]: [value: string];
+  };
+}
+export default function Subscription() {
+  return (
+    <AuthCheck>
+      <Suspense fallback={<Loading />}>
+        <SubscriptionHandler />
+      </Suspense>
+    </AuthCheck>
+  );
+}
+let fetcher = async () => {
+  const subscription = await FetchFromAPI("subscription", {
+    method: "GET",
+  });
+  let wallet = [];
+  if (subscription.length === 0) {
+    wallet = await FetchFromAPI("wallet", { method: "GET" });
+  }
+  console.log(subscription, wallet);
+  return { subscription, wallet } as {
+    subscription: SubInfo[];
+    wallet: AllCardInfo[];
+  };
+};
+
 function SubscriptionHandler() {
+  const { data } = useSWR<{ subscription: SubInfo[]; wallet: AllCardInfo[] }>(
+    "data",
+    fetcher,
+    { suspense: true }
+  );
+
+  const { subscription, wallet } = data || {};
+  // mutate("data", null);
+  // const { data: wallet } = useSWR<AllCardInfo[]>(
+  //   ["wallet", { method: "GET" }],
+  //   (args: [string, { method: string }]) => {
+  //     const [url, opts] = args;
+  //     return FetchFromAPI(url, opts);
+  //   },
+  //   { suspense: true }
+  // );
+  // console.log(wallet, subscriptions);
   const amount = useStore((state) => state.amount);
-  const [selectedCard, setSelectedCard] = useState<string>();
-  const [wallet, setWallet] = useState<AllCardInfo[]>([]);
+  const [selectedCard, setSelectedCard] = useState<string | null>(
+    wallet.length ? wallet[0].id : null
+  );
   const stripe = useStripe();
   const [loading, setLoading] = useState(false);
   const user = useStore((state) => state.userInfo);
-  useEffect(() => {
-    (async () => {
-      await getWallet();
-      await getSubscription();
-    })();
-  }, [user]);
-  async function getSubscription() {
-    // let a = await FetchFromAPI("subscription", { method: "GET" });
-  }
-  async function subscription() {
+
+  async function subToSubscription() {
     setLoading(true);
     try {
       let subObj = await FetchFromAPI("subscription", {
         method: "POST",
-        body: { amount, payment_method: selectedCard },
+        body: { amount, payment_method: selectedCard as string },
       });
       const { latest_invoice } = subObj;
       if (latest_invoice.payment_intent) {
@@ -67,17 +110,9 @@ function SubscriptionHandler() {
 
     setLoading(false);
   }
-  const getWallet = async () => {
-    const cards: AllCardInfo[] = await FetchFromAPI("wallet", {
-      method: "GET",
-    });
-
-    setWallet(cards);
-
-    if (cards.length) {
-      setSelectedCard(cards[0].id);
-    }
-  };
+  if (subscription.length !== 0) {
+    return <EditSubscription />;
+  }
   return (
     <div className=" flex h-[80vh] justify-center items-center">
       <div className="flex flex-col justify-center items-center gap-3 border-2 border-black border-solid p-4 sm:p-2 sm:pt-5">
@@ -90,34 +125,44 @@ function SubscriptionHandler() {
         <div>
           Pay {amount * 500} rupee for {amount} bottle of Wine Per Month
         </div>
-        <select
-          className="border-solid border-2 p-2 rounded-md  "
-          onChange={(e) => {
-            e.preventDefault();
+        {wallet.length ? (
+          <>
+            <select
+              className="border-solid border-2 p-2 rounded-md  "
+              onChange={(e) => {
+                e.preventDefault();
 
-            setSelectedCard(e.target.value);
-          }}
-        >
-          {wallet.map((paymentSource: AllCardInfo, i) => {
-            return (
-              <CreditCardToken
-                key={paymentSource.id}
-                id={paymentSource.id}
-                card={paymentSource.card as CardInfo}
-              />
-            );
-          })}
-        </select>
-
-        <button
-          className={`bg-green-400 ${
-            !loading && "hover:bg-green-300"
-          } px-4 py-2 rounded`}
-          disabled={loading}
-          onClick={subscription}
-        >
-          {loading ? "loading..." : "subscription"}
-        </button>
+                setSelectedCard(e.target.value);
+              }}
+            >
+              {wallet.map((paymentSource: AllCardInfo, i) => {
+                return (
+                  <CreditCardToken
+                    key={paymentSource.id}
+                    id={paymentSource.id}
+                    card={paymentSource.card as CardInfo}
+                  />
+                );
+              })}
+            </select>
+            <button
+              className={`bg-slate-400 ${
+                !loading && "hover:bg-slate-300"
+              } px-4 py-2 rounded`}
+              disabled={loading}
+              onClick={subToSubscription}
+            >
+              {loading ? "loading..." : "Pay"}
+            </button>
+          </>
+        ) : (
+          <Link
+            href="/profile"
+            className="bg-slate-400 hover:bg-slate-300 p-2 rounded"
+          >
+            Add Card
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -129,12 +174,5 @@ function CreditCardToken({ card, id }: { card: CardInfo; id: string }) {
     <option value={id}>
       {brand} **** **** **** {last4} expires {exp_month}/{exp_year}
     </option>
-  );
-}
-export default function Subscription() {
-  return (
-    <AuthCheck>
-      <SubscriptionHandler />
-    </AuthCheck>
   );
 }

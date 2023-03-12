@@ -1,23 +1,23 @@
 import { FetchFromAPI } from "@/lib/helper";
-import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import {
-  PaymentIntent,
-  SetupIntent,
-  StripeCardElement,
-} from "@stripe/stripe-js";
-import { FormEvent, useEffect, useState } from "react";
+import { useStripe } from "@stripe/react-stripe-js";
+import { PaymentIntent } from "@stripe/stripe-js";
+
+import useSWR, { useSWRConfig } from "swr";
+import { Suspense, useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { collection, doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firestore";
+import { db } from "@/lib/firestore";
 import AuthCheck from "@/components/authCheck";
-import { useRouter } from "next/router";
 import Image from "next/image";
+import Loading from "@/components/loading";
+import Link from "next/link";
 interface CardInfo {
   last4: string;
   brand: string;
   exp_month: string;
   exp_year: string;
 }
+
 interface AllCardInfo {
   card: CardInfo;
   id: string;
@@ -25,23 +25,36 @@ interface AllCardInfo {
 export default function PaymentWithAuth() {
   return (
     <AuthCheck>
-      <Payment />
+      <Suspense fallback={<Loading />}>
+        <Payment />
+      </Suspense>
     </AuthCheck>
   );
 }
 function Payment() {
+  const { data: wallet } = useSWR<AllCardInfo[]>(
+    ["wallet", { method: "GET" }],
+    (args: [string, { method: string }]) => {
+      const [url, opts] = args;
+      return FetchFromAPI(url, opts);
+    },
+    {
+      suspense: true,
+    }
+  );
+  const { cache } = useSWRConfig();
   const stripe = useStripe();
-  const [wallet, setWallet] = useState<AllCardInfo[]>([]);
   const amount = useStore((state) => state.amount);
   const user = useStore((state) => state.userInfo);
-  const [cardId, setCardId] = useState<string>();
+  const [cardId, setCardId] = useState<string | null>(
+    wallet.length ? wallet[0].id : null
+  );
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   useEffect(() => {
-    getWallet();
-    console.log(wallet);
+    return () => {
+      cache.delete(["wallet", { method: "GET" }]);
+    };
   }, [user]);
-
   async function CreateIntentAndPay() {
     setLoading(true);
     try {
@@ -54,7 +67,7 @@ function Payment() {
           if (userInfo?.stripeCustomerId) {
             const customer = userInfo.stripeCustomerId;
             const intent = await FetchFromAPI("payments", {
-              body: { amount: amount, id: cardId, customer },
+              body: { amount: amount, id: cardId as string, customer },
             });
             Pay(intent);
           }
@@ -65,19 +78,7 @@ function Payment() {
       setLoading(false);
     }
   }
-  const getWallet = async () => {
-    if (user) {
-      const cards: AllCardInfo[] = await FetchFromAPI("wallet", {
-        method: "GET",
-      });
 
-      setWallet(cards);
-
-      if (cards.length) {
-        setCardId(cards[0].id);
-      }
-    }
-  };
   async function Pay(intent: PaymentIntent) {
     try {
       if (stripe && intent) {
@@ -110,34 +111,44 @@ function Payment() {
         <div>
           Pay {amount * 500} rupee for {amount} bottle of Wine
         </div>
-        <select
-          className="border-solid border-2 p-2 rounded-md  "
-          onChange={(e) => {
-            e.preventDefault();
+        {wallet.length ? (
+          <>
+            <select
+              className="border-solid border-2 p-2 rounded-md  "
+              onChange={(e) => {
+                e.preventDefault();
 
-            setCardId(e.target.value);
-          }}
-        >
-          {wallet.map((paymentSource: AllCardInfo, i) => {
-            return (
-              <CreditCardToken
-                key={paymentSource.id}
-                id={paymentSource.id}
-                card={paymentSource.card as CardInfo}
-              />
-            );
-          })}
-        </select>
-
-        <button
-          className={`bg-green-400 ${
-            !loading && "hover:bg-green-300"
-          } px-4 py-2 rounded`}
-          disabled={loading}
-          onClick={CreateIntentAndPay}
-        >
-          {loading ? "loading..." : "Pay"}
-        </button>
+                setCardId(e.target.value);
+              }}
+            >
+              {wallet.map((paymentSource: AllCardInfo, i) => {
+                return (
+                  <CreditCardToken
+                    key={paymentSource.id}
+                    id={paymentSource.id}
+                    card={paymentSource.card as CardInfo}
+                  />
+                );
+              })}
+            </select>
+            <button
+              className={`bg-slate-400 ${
+                !loading && "hover:bg-slate-300"
+              } px-4 py-2 rounded`}
+              disabled={loading}
+              onClick={CreateIntentAndPay}
+            >
+              {loading ? "loading..." : "Pay"}
+            </button>
+          </>
+        ) : (
+          <Link
+            href="/profile"
+            className="bg-slate-400 hover:bg-slate-300 p-2 rounded"
+          >
+            Add Card
+          </Link>
+        )}
       </div>
     </div>
   );

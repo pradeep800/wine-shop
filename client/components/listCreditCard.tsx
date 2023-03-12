@@ -1,11 +1,12 @@
 import { FetchFromAPI } from "@/lib/helper";
 import { useStore } from "@/lib/store";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import Stripe from "stripe";
 import { StripeCardElement } from "@stripe/stripe-js";
-import { ChangeEvent, FormEvent } from "react";
-
+import { FormEvent } from "react";
+import useSWR from "swr";
+import Loading from "./loading";
 interface CardInfo {
   last4: string;
   brand: string;
@@ -17,24 +18,36 @@ interface AllCardInfo {
   id: string;
 }
 export default function ListCreditCard() {
+  /*
+   * Using suspense for showing loading screen until everything load
+   */
   return (
-    <Suspense fallback={<h1>Loading...</h1>}>
+    <Suspense fallback={<Loading />}>
       <CreditCards />
     </Suspense>
   );
 }
 function CreditCards() {
+  /*
+   * Get all CreditCards and put it and wallet
+   */
+  const { data } = useSWR(
+    ["wallet", { method: "GET" }],
+    (args) => {
+      const [url, opts] = args;
+      return FetchFromAPI(url, opts);
+    },
+    { suspense: true }
+  );
+
   const stripe = useStripe();
   const elements = useElements();
   const user = useStore((state) => state.userInfo);
   const [setupIntent, setSetupIntent] = useState<
     Stripe.SetupIntent | undefined
   >();
-  const [wallet, setWallet] = useState<AllCardInfo[]>([]);
-  const [error, setError] = useState(false);
-  useEffect(() => {
-    getWallet();
-  }, [user]);
+  const [wallet, setWallet] = useState<AllCardInfo[]>(data);
+
   /*
    * For getting all the card which are attach to this account
    */
@@ -47,7 +60,7 @@ function CreditCards() {
     }
   };
   /*
-   *Create Setup intent
+   * Create Setup intent
    */
   const createSetupIntent = async () => {
     const si = (await FetchFromAPI("wallet", {})) as Stripe.SetupIntent;
@@ -64,7 +77,6 @@ function CreditCards() {
         await stripe.confirmCardSetup(setupIntent?.client_secret as string, {
           payment_method: { card: cardElement },
         });
-      console.log(setupIntent);
       if (error) {
         alert(error.message);
         console.log(error);
@@ -79,12 +91,7 @@ function CreditCards() {
       alert("refresh the page");
     }
   };
-  if (error) {
-    throw Error("something went wrong");
-  }
-  function handleChange(e: ChangeEvent<HTMLSelectElement>) {
-    e.preventDefault();
-  }
+
   return (
     <div className="w-[100%] flex justify-center h-[80vh] items-center">
       <div className="max-w-[700px]  flex justify-center flex-col items-center">
@@ -92,10 +99,7 @@ function CreditCards() {
           {wallet.length ? (
             <div className="pb-8">
               <h2 className="text-center pb-2">All Your Cards</h2>
-              <select
-                className="border-solid border-2 p-2 rounded-md  "
-                onChange={handleChange}
-              >
+              <select className="border-solid border-2 p-2 rounded-md  ">
                 {wallet.map((paymentSource: AllCardInfo, i) => {
                   return (
                     <CreditCardToken
@@ -110,8 +114,8 @@ function CreditCards() {
           ) : null}
 
           <button
-            className={` bg-green-400 ${
-              !!!setupIntent && "hover:bg-green-300"
+            className={` bg-slate-400 ${
+              !!!setupIntent && "hover:bg-slate-300"
             } rounded py-1 px-1 ${wallet.length ? "mb-5" : "mb-2"}`}
             disabled={!!setupIntent}
             onClick={createSetupIntent}
@@ -129,7 +133,7 @@ function CreditCards() {
 
             <div className="text-center">
               <button
-                className="bg-green-300 hover:bg-green-400 px-3 py-1 rounded"
+                className="bg-slate-400 hover:bg-slate-300 px-3 py-1 rounded"
                 type="submit"
               >
                 Attach
@@ -141,6 +145,9 @@ function CreditCards() {
     </div>
   );
 }
+/*
+ * Creating option for selection
+ */
 function CreditCardToken({ card, id }: { card: CardInfo; id: string }) {
   const { last4, brand, exp_month, exp_year } = card;
 

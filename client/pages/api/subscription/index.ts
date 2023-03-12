@@ -15,8 +15,8 @@ async function Subscription(req: MyApiRequest, res: NextApiResponse) {
 }
 async function handleGet(req: MyApiRequest, res: NextApiResponse) {
   const uid = validateUser(req).uid as string;
-  let customer = getOrCreateCustomer(uid);
-  const list = stripe.subscriptions.list();
+  let customer = await getOrCreateCustomer(uid);
+  const list = stripe.subscriptions.list({ customer: customer.id });
   return (await list).data;
 }
 async function handlePost(req: MyApiRequest, res: NextApiResponse) {
@@ -24,22 +24,26 @@ async function handlePost(req: MyApiRequest, res: NextApiResponse) {
   let { payment_method, amount }: { payment_method: string; amount: number } =
     req.body;
   const plan = process.env.product_id;
-  console.log(plan);
-  try {
-    let customer = await getOrCreateCustomer(uid);
-    const subscription = await stripe.subscriptions.create({
-      customer: customer.id,
-      items: [{ plan, quantity: amount }],
+  let customer = await getOrCreateCustomer(uid);
+  if (req.body.method === "GET") {
+    let allSub = await stripe.subscriptions.list();
+    return allSub;
+  } else {
+    try {
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{ plan, quantity: amount }],
 
-      expand: ["latest_invoice.payment_intent"],
-      default_payment_method: payment_method,
-    });
-    const invoice = subscription.latest_invoice as Stripe.Invoice;
-    const payment_intent = invoice.payment_intent as Stripe.PaymentIntent;
-    return subscription;
-  } catch (err) {
-    console.log(err);
+        expand: ["latest_invoice.payment_intent"],
+        default_payment_method: payment_method,
+      });
+      const invoice = subscription.latest_invoice as Stripe.Invoice;
+      const payment_intent = invoice.payment_intent as Stripe.PaymentIntent;
+      return subscription;
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send("server error");
+    }
   }
-  return { message: "some error" };
 }
 export default decodeJWT(runAsync(Subscription));

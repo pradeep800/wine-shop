@@ -34,7 +34,9 @@ export async function getOrCreateCustomer(
 ) {
   const userSnapshot = await db.collection("users").doc(userId).get();
   const { stripeCustomerId, email, displayName } = userSnapshot.data() || {};
-
+  if (!email) {
+    throw Error("there is no name");
+  }
   // If missing customerID, create it
   if (!stripeCustomerId) {
     // CREATE new customer

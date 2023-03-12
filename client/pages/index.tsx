@@ -66,15 +66,15 @@ export default function Home() {
               +
             </button>
           </div>
-          <div className="flex justify-around mt-[50px] md:mt-[30px] md:mb-[30px]">
+          <div className="flex justify-around mt-[50px] md:mt-[30px] md:mb-[30px] text-white">
             <Link href="/payment">
-              <button className="bg-blue-400 hover:bg-blue-300 px-8 py-3 rounded">
+              <button className="bg-slate-400 hover:bg-slate-300 px-8 py-3 rounded">
                 Pay
               </button>
             </Link>
 
             <Link href={"/subscription"}>
-              <button className="bg-blue-500 hover:bg-blue-400 px-8 py-3 rounded">
+              <button className="bg-slate-500 hover:bg-slate-400 px-8 py-3 rounded">
                 Subscription
               </button>
             </Link>

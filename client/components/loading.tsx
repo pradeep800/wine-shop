@@ -1,9 +1,11 @@
 export default function Loading() {
   return (
-    <div className=" ">
-      <div className=" sm:w-[10px] w-[3px] animate-l1 sm:h-[10px] h-[3px] rounded-full bg-blue-400"></div>
-      <div className="sm:w-[10px] w-[3px] animate-l2 sm:h-[10px] h-[3px] rounded-full bg-blue-400"></div>
-      <div className="sm:w-[10px] w-[3px] animate-l3 sm:h-[10px] h-[3px] rounded-full bg-blue-400"></div>
+    <div className="h-[80vh] flex justify-center items-center">
+      <div className=" flex gap-4 ">
+        <div className="w-[20px] h-[20px] animate-l1 rounded-full bg-blue-400"></div>
+        <div className="w-[20px] h-[20px] animate-l2 rounded-full bg-blue-400"></div>
+        <div className="w-[20px] h-[20px] animate-l3 rounded-full bg-blue-400"></div>
+      </div>
     </div>
   );
 }

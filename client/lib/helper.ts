@@ -12,6 +12,7 @@ export async function FetchFromAPI(
       payment_method?: string;
       id?: string;
       customer?: string;
+      plan?: string;
     };
   }
 ) {
@@ -29,10 +30,8 @@ export async function FetchFromAPI(
     },
   });
   if (res.ok) {
-    console.log(res);
     return res.json();
   } else {
-    console.log(res);
     throw Error("unable to process request");
   }
 }

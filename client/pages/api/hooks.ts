@@ -15,25 +15,25 @@ type WebhookHandlers = {
 };
 const webhookHandlers: WebhookHandlers = {
   "checkout.session.completed": async (data: Stripe.Event.Data) => {
-    // Add your business logic here
+    console.log("checkout.session.completed");
   },
   "payment_intent.succeeded": async (data: Stripe.PaymentIntent) => {
-    // Add your business logic here
+    console.log("payment_intent.succeeded");
   },
   "payment_intent.payment_failed": async (data: Stripe.PaymentIntent) => {
-    // Add your business logic here
+    console.log("payment_intent.payment_failed");
   },
   "customer.subscription.deleted": async (data: Stripe.Subscription) => {
-    //add business logic
+    console.log("customer.subscription.deleted");
   },
   "customer.subscription.created": async (data: Stripe.Subscription) => {
-    //add business logic here
+    console.log("customer.subscription.created");
   },
   "invoice.payment_succeeded": async (data: Stripe.Invoice) => {
-    // Add your business logic here
+    console.log("invoice.payment_succeeded");
   },
   "invoice.payment_failed": async (data: Stripe.Invoice) => {
-    //add your business logic here
+    console.log("invoice.payment_failed");
   },
 };
 

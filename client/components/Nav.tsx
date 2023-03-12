@@ -59,7 +59,7 @@ export function Nav() {
             </Link>
 
             <button
-              className=" border-red-500 border-2 border-solid rounded p-2 hover:bg-red-400"
+              className=" border-slate-500 border-2 border-solid rounded p-2 hover:bg-slate-400"
               onClick={SignOut}
             >
               Logout

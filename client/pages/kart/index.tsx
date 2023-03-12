@@ -1,12 +1,71 @@
 import AuthCheck from "@/components/authCheck";
-
-export default function Cart() {
-  let amount = 10;
-  let date = "20-3-30";
-  let card = "*** *** *** *** ***";
+import Loading from "@/components/loading";
+import { FetchFromAPI } from "@/lib/helper";
+import { Suspense, useState } from "react";
+import Stripe from "stripe";
+import useSWR from "swr";
+interface Subscription {
+  quantity: number;
+  id: string;
+  customer: string;
+  items: {
+    data: [{ id: string }];
+  };
+}
+interface FetchInterface {
+  payment: Stripe.PaymentIntent[];
+  subscription: Subscription[];
+}
+const fetcher = async (url: string) => {
+  let { payment, subscription } = await FetchFromAPI(url, { method: "GET" });
+  console.log(payment, subscription);
+  return { payment, subscription } as FetchInterface;
+};
+export default function AuthKart() {
   return (
     <AuthCheck>
-      <div className="flex  h-[80vh] flex-col items-center">
+      <Suspense fallback={<Loading />}>
+        <Kart />
+      </Suspense>
+    </AuthCheck>
+  );
+}
+function Kart() {
+  const { data } = useSWR<FetchInterface>("payments/success", fetcher, {
+    suspense: true,
+  });
+  const [input, setInput] = useState<string>("");
+  return (
+    <div>
+      <div>{data.subscription[0].quantity}</div>
+      <div>Edit</div>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          let a = await FetchFromAPI("subscription/updatePlan", {
+            method: "POST",
+            body: {
+              plan: data.subscription[0].id as string,
+              id: data.subscription[0].items.data[0].id,
+              amount: parseInt(input),
+            },
+          });
+          console.log(a);
+        }}
+      >
+        <input
+          className="border-2"
+          type={"number"}
+          defaultValue={0}
+          onChange={(e) => {
+            setInput(e.target.value);
+          }}
+        />
+        <button>save</button>
+      </form>
+    </div>
+  );
+  /* <div className="flex  h-[80vh] flex-col items-center">
         <section className="w-[700px] md:w-[400px] border-2 h-min p-3 mt-8">
           <div className="text-center text-2xl">Subscription</div>
           <div className=" ">
@@ -40,7 +99,5 @@ export default function Cart() {
             </li>
           </ol>
         </section>
-      </div>
-    </AuthCheck>
-  );
+      </div> */
 }
