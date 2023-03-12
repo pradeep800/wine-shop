@@ -3,7 +3,6 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import getRawBody from "raw-body";
 type WebhookHandlers = {
-  "checkout.session.completed": (data: Stripe.Event.Data) => Promise<void>;
   "payment_intent.succeeded": (data: Stripe.PaymentIntent) => Promise<void>;
   "payment_intent.payment_failed": (
     data: Stripe.PaymentIntent
@@ -14,9 +13,6 @@ type WebhookHandlers = {
   "invoice.payment_failed": (data: Stripe.Invoice) => Promise<void>;
 };
 const webhookHandlers: WebhookHandlers = {
-  "checkout.session.completed": async (data: Stripe.Event.Data) => {
-    console.log("checkout.session.completed");
-  },
   "payment_intent.succeeded": async (data: Stripe.PaymentIntent) => {
     console.log("payment_intent.succeeded");
   },
