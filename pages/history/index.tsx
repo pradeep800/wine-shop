@@ -198,7 +198,7 @@ function Cart() {
             <tbody>
               {paymentHistory?.map((payment, index) => {
                 return (
-                  <tr className="table-row hover:bg-slate-100 ">
+                  <tr key={index} className="table-row hover:bg-slate-100 ">
                     <td className="border-2 px-4 py-2">{index + 1}</td>
                     <td className="border-2 px-4 py-2">
                       {payment.amount / 100}
