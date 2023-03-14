@@ -166,6 +166,7 @@ function Payment() {
     </div>
   );
 }
+
 function CreditCardToken({ card, id }: { card: CardInfo; id: string }) {
   const { last4, brand, exp_month, exp_year } = card;
 

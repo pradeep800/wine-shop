@@ -56,7 +56,7 @@ export function runAsync(callback: Function) {
 }
 
 /*
- * For validating User
+ * For validating and Adding currentUser in req
  */
 export function validateUser(req: MyApiRequest) {
   const user = req["currentUser"];
