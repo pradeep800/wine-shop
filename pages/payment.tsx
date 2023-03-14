@@ -11,6 +11,7 @@ import AuthCheck from "@/components/authCheck";
 import Image from "next/image";
 import Loading from "@/components/loading";
 import Link from "next/link";
+import { useRouter } from "next/router";
 interface CardInfo {
   last4: string;
   brand: string;
@@ -42,6 +43,7 @@ function Payment() {
       suspense: true,
     }
   );
+  const router = useRouter();
   const { cache } = useSWRConfig();
   const stripe = useStripe();
   const amount = useStore((state) => state.amount);
@@ -91,6 +93,7 @@ function Payment() {
           alert("error: " + error.message);
         } else {
           alert("Successfully Paid");
+          router.push("/");
         }
       }
     } catch (err) {

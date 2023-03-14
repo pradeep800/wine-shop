@@ -9,7 +9,7 @@ export default function EditSubscription() {
       </div>
       <Link
         className="bg-slate-400 hover:bg-slate-300 p-3 rounded"
-        href="/cart"
+        href="/history"
       >
         Edit Plan
       </Link>

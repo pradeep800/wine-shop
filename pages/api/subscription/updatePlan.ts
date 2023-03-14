@@ -4,7 +4,6 @@ import { MyApiRequest } from "../wallet";
 import { NextApiResponse } from "next";
 import { stripe } from "@/lib/stripe";
 async function HandleUpdatePlan(req: MyApiRequest, res: NextApiResponse) {
-  console.log(req.body);
   let subscription;
   try {
     subscription = await stripe.subscriptions.update(req.body.plan, {

@@ -13,38 +13,41 @@ async function Success(req: MyApiRequest, res: NextApiResponse) {
   let params: Stripe.PaymentIntentListParams = {
     customer: customer.id,
   };
-  console.log("start after", start_after);
+
   if (start_after) {
     params.starting_after = start_after;
   }
+  try {
+    const successfulPayment = await stripe.paymentIntents.list(params);
 
-  const successfulPayment = await stripe.paymentIntents.list(params);
-  const subscriptionPayment = await stripe.subscriptions.list({
-    customer: customer.id,
-  });
-  let payments: any[] = [];
-  let sf = successfulPayment.data[successfulPayment.data.length - 1].id;
-  for (const payment of successfulPayment.data) {
-    if (payment.status === "succeeded") {
-      let card = await stripe.paymentMethods.retrieve(
-        payment.payment_method as string
-      );
+    const subscriptionPayment = await stripe.subscriptions.list({
+      customer: customer.id,
+    });
+    let payments: any[] = [];
 
-      payments.push({
-        amount: payment.amount,
-        ...card,
-        created: payment.created,
-      });
+    for (const payment of successfulPayment.data) {
+      if (payment.status === "succeeded") {
+        let card = await stripe.paymentMethods.retrieve(
+          payment.payment_method as string
+        );
+
+        payments.push({
+          amount: payment.amount,
+          ...card,
+          created: payment.created,
+        });
+      }
     }
+    return {
+      payments: payments ?? [],
+      subscription: subscriptionPayment.data[0] ?? undefined,
+      start_after:
+        successfulPayment.data[successfulPayment.data.length - 1]?.id,
+      has_more: successfulPayment.has_more,
+    };
+  } catch (err) {
+    console.log(err);
+    res.status(505).send("server error");
   }
-
-  // return { amount: payment. ,};
-  console.log({ start_after: sf, has_more: successfulPayment.has_more });
-  return {
-    payments: payments ?? [],
-    subscription: subscriptionPayment.data[0] ?? undefined,
-    start_after: sf,
-    has_more: successfulPayment.has_more,
-  };
 }
 export default decodeJWT(runAsync(Success));

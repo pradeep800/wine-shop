@@ -68,7 +68,6 @@ export default async function handleStripeWebhook(
 ) {
   const rawBody = await getRawBody(req);
   const signature = req.headers["stripe-signature"] as string;
-  console.log(process.env.STRIPE_WEBHOOK_SECRET);
   try {
     const event = stripe.webhooks.constructEvent(
       rawBody,

@@ -3,11 +3,12 @@ import { useStore } from "@/lib/store";
 import { useStripe } from "@stripe/react-stripe-js";
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import useSWR, { mutate } from "swr";
+import useSWR, { mutate, useSWRConfig } from "swr";
 import AuthCheck from "@/components/authCheck";
 import Loading from "@/components/loading";
 import Link from "next/link";
 import EditSubscription from "@/components/editSubscription";
+import { useRouter } from "next/router";
 export interface CardInfo {
   last4: string;
   brand: string;
@@ -41,7 +42,6 @@ let fetcher = async () => {
   if (subscription.length === 0) {
     wallet = await FetchFromAPI("wallet", { method: "GET" });
   }
-  console.log(subscription, wallet);
   return { subscription, wallet } as {
     subscription: SubInfo[];
     wallet: AllCardInfo[];
@@ -56,24 +56,21 @@ function SubscriptionHandler() {
   );
 
   const { subscription, wallet } = data || {};
-  // mutate("data", null);
-  // const { data: wallet } = useSWR<AllCardInfo[]>(
-  //   ["wallet", { method: "GET" }],
-  //   (args: [string, { method: string }]) => {
-  //     const [url, opts] = args;
-  //     return FetchFromAPI(url, opts);
-  //   },
-  //   { suspense: true }
-  // );
-  // console.log(wallet, subscriptions);
+  const { cache } = useSWRConfig();
   const amount = useStore((state) => state.amount);
   const [selectedCard, setSelectedCard] = useState<string | null>(
     wallet.length ? wallet[0].id : null
   );
-  const stripe = useStripe();
-  const [loading, setLoading] = useState(false);
   const user = useStore((state) => state.userInfo);
 
+  const stripe = useStripe();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    return () => {
+      cache.delete(["wallet", { method: "GET" }]);
+    };
+  }, [user]);
   async function subToSubscription() {
     setLoading(true);
     try {
@@ -95,7 +92,8 @@ function SubscriptionHandler() {
               await FetchFromAPI("subscription/remove", { method: "GET" });
               return;
             } else {
-              alert("success");
+              alert("Successfully Subscribed!");
+              router.push("/");
             }
           } else {
             console.error("Stripe object is null");

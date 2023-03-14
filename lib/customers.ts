@@ -52,7 +52,6 @@ export async function getOrCreateCustomer(
       { stripeCustomerId: customer.id },
       { merge: true }
     );
-    console.log(customer, email);
     return customer;
   } else {
     return (await stripe.customers.retrieve(

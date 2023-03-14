@@ -15,7 +15,6 @@ let cred = {
   client_x509_cert_url: process.env.client_x509_cert_url,
 };
 const serviceAccount = Object.assign({}, cred) as ServiceAccount;
-// console.log(serviceAccount);
 const app = firebaseAdmin.apps.length
   ? firebaseAdmin.app()
   : firebaseAdmin.initializeApp({

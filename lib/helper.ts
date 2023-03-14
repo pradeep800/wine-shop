@@ -21,7 +21,6 @@ export async function FetchFromAPI(
   const { method, body } = { method: "POST", body: null, ...opts };
   const user = auth.currentUser;
   const token = user && (await user.getIdToken());
-  console.log(endpointURL);
   const res = await fetch(`./api/${endpointURL}`, {
     method,
     ...((body as { [key: string]: string | number } | null) && {
