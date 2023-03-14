@@ -13,7 +13,6 @@ async function Success(req: MyApiRequest, res: NextApiResponse) {
   let customer = await getOrCreateCustomer(user.uid);
   let params: Stripe.PaymentIntentListParams = {
     customer: customer.id,
-    limit: 20,
   };
 
   if (start_after) {
