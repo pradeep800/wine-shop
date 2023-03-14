@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { useStore } from "@/lib/store";
-import Ask from "./askForLogIn";
+import Ask from "./ask";
 export default function AuthCheck({ children }: { children: React.ReactNode }) {
   const userInfo = useStore((state) => state.userInfo);
 
