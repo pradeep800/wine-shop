@@ -14,12 +14,14 @@ export async function FetchFromAPI(
       customer?: string;
       plan?: string;
       subscriptionId?: string;
+      start_after?: string;
     };
   }
 ) {
   const { method, body } = { method: "POST", body: null, ...opts };
   const user = auth.currentUser;
   const token = user && (await user.getIdToken());
+  console.log(endpointURL);
   const res = await fetch(`./api/${endpointURL}`, {
     method,
     ...((body as { [key: string]: string | number } | null) && {
@@ -30,6 +32,7 @@ export async function FetchFromAPI(
       Authorization: `Bearer ${token}`,
     },
   });
+
   if (res.ok) {
     return res.json();
   } else {

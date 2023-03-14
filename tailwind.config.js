@@ -3,7 +3,9 @@ module.exports = {
   theme: {
     screens: {
       sm: { max: "500px" },
+      bsm: { max: "600px" },
       md: { max: "768px" },
+      bmd: { max: "820px" },
       lg: { max: "1024px" },
       xl: { max: "1280px" },
     },

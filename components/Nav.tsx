@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
-import kart from "@/static/images/kart.png";
+import history from "@/static/images/history.png";
 import Image from "next/image";
 import Link from "next/link";
 import { useUserData } from "@/lib/useUserData";
@@ -48,7 +48,7 @@ export function Nav() {
 
         {userInfo?.uid ? (
           <div className="ml-auto flex gap-4 shrink-0">
-            <Link href="/profile">
+            <Link aria-label="Link To Profile(adding Card)" href="/profile">
               <Image
                 src={userInfo.photoURL as string}
                 alt="my photo"
@@ -65,8 +65,12 @@ export function Nav() {
             >
               Logout
             </button>
-            <Link href="/kart" className="shrink-0">
-              <Image src={kart} alt="kart" width={40} height={40} />
+            <Link
+              href="/history"
+              className="shrink-0"
+              aria-label="Link To History"
+            >
+              <Image src={history} alt="history" width={40} height={40} />
             </Link>
           </div>
         ) : (

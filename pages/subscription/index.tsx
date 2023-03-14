@@ -8,7 +8,7 @@ import AuthCheck from "@/components/authCheck";
 import Loading from "@/components/loading";
 import Link from "next/link";
 import EditSubscription from "@/components/editSubscription";
-interface CardInfo {
+export interface CardInfo {
   last4: string;
   brand: string;
   exp_month: string;

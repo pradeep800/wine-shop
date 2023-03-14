@@ -3,6 +3,16 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import getRawBody from "raw-body";
 import { db } from "@/lib/firestore-sdk";
+import { DocumentData } from "firebase/firestore";
+import { FetchFromAPI } from "@/lib/helper";
+export interface User {
+  displayName: string;
+  email: string;
+  photoURL: string;
+  stripeCustomerId: string;
+  subscriptionStatus: string;
+  uid: string;
+}
 type WebhookHandlers = {
   "customer.subscription.deleted": (data: Stripe.Subscription) => Promise<void>;
   "customer.subscription.created": (data: Stripe.Subscription) => Promise<void>;
@@ -34,7 +44,21 @@ const webhookHandlers: WebhookHandlers = {
       .collection("users")
       .doc(customer.metadata.firebaseUID)
       .get();
-    await snapShot.ref.update({ subscriptionStatus: "PAST_DUE" });
+    const snapShotData = snapShot.data() as User;
+
+    let subscription = (
+      await stripe.subscriptions.list({
+        customer: snapShotData.stripeCustomerId,
+      })
+    ).data[0];
+
+    if (subscription.status === "active") {
+      await snapShot.ref.update({ subscriptionStatus: "PAST_DUE" });
+    } else {
+      await FetchFromAPI("subscription/cancelPlan", {
+        body: { subscriptionId: subscription.id },
+      });
+    }
   },
 };
 
