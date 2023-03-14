@@ -1,3 +1,7 @@
+/*
+ * You can only buy one Subscription after that you can edit it as you like
+ * This page is shown whenever there is already one subscription Activated
+ */
 import Link from "next/link";
 export default function EditSubscription() {
   return (

@@ -23,6 +23,9 @@ interface AllCardInfo {
   card: CardInfo;
   id: string;
 }
+/*
+ * Page for Paying for amount of wine you buy
+ */
 export default function PaymentWithAuth() {
   return (
     <AuthCheck>
@@ -33,6 +36,9 @@ export default function PaymentWithAuth() {
   );
 }
 function Payment() {
+  /*
+   * Fetch all Cards
+   */
   const { data: wallet } = useSWR<AllCardInfo[]>(
     ["wallet", { method: "GET" }],
     (args: [string, { method: string }]) => {
@@ -53,10 +59,14 @@ function Payment() {
   );
   const [loading, setLoading] = useState(false);
   useEffect(() => {
+    /*
+     * Whenever is destroyed delete the wallet information from cache
+     */
     return () => {
       cache.delete(["wallet", { method: "GET" }]);
     };
   }, [user]);
+  // for creating intent
   async function CreateIntentAndPay() {
     setLoading(true);
     try {
@@ -80,7 +90,7 @@ function Payment() {
       setLoading(false);
     }
   }
-
+  // for paying
   async function Pay(intent: PaymentIntent) {
     try {
       if (stripe && intent) {

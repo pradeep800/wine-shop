@@ -1,6 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+/*
+ * Public config keys
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyABvG36NBU7J5puMCfSLnPp6NJ0pRBvwmE",
   authDomain: "wineshop-cc8a2.firebaseapp.com",

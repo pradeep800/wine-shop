@@ -1,10 +1,11 @@
-import { auth } from "@/lib/firestore";
-import { useRouter } from "next/router";
+/*
+ * It is use for showing only pages authenticated users
+ */
 import React from "react";
 import { useStore } from "@/lib/store";
-import AskForLogIn from "./AskForLogIn";
+import AskForLogIn from "./askForLogIn";
 export default function AuthCheck({ children }: { children: React.ReactNode }) {
   const userInfo = useStore((state) => state.userInfo);
-  const router = useRouter();
+
   return userInfo ? <>{children}</> : <AskForLogIn />;
 }

@@ -26,6 +26,9 @@ interface FetchInterface {
   start_after: string;
   has_more?: string;
 }
+/*
+ * For initial fetching
+ */
 const fetcher = async (url: string) => {
   let { payments, subscription, start_after, has_more } = await FetchFromAPI(
     url,
@@ -43,6 +46,9 @@ export default function AuthKart() {
     </AuthCheck>
   );
 }
+/*
+ * Use for Pagination
+ */
 const fetchMore = async (start_after: string) => {
   let {
     payments,
@@ -71,6 +77,9 @@ function History() {
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [allLoading, setAllLoading] = useState(true);
+  /*
+   * For fetching initial detail like subscription, payment history and card details
+   */
   useEffect(() => {
     (async () => {
       const {
@@ -87,6 +96,9 @@ function History() {
       setHasMore(has_more);
     })();
   }, []);
+  /*
+   * For Canceling subscription
+   */
   async function cancel() {
     await FetchFromAPI("subscription/cancelPlan", {
       body: {
@@ -96,7 +108,9 @@ function History() {
     setSubscription(undefined);
     alert("Cancel Successful");
   }
-
+  /*
+   * for Saving subscription update that mean number of wine
+   */
   const saveUpdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -119,10 +133,11 @@ function History() {
       alert("Unable to update");
     }
   };
-
+  // Show this Component until everything is fetched
   if (allLoading) {
     return <Loading />;
   }
+  //Whenever there is no Payment history and subscription it show no History
   if (JSON.stringify(paymentHistory) === "[]" && !subscription) {
     return <EmptyHistory />;
   }

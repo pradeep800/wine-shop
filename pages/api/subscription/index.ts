@@ -2,10 +2,12 @@ import { getOrCreateCustomer } from "@/lib/customers";
 import { decodeJWT } from "@/lib/decodeJWT";
 import { runAsync, validateUser } from "@/lib/helper";
 import { stripe } from "@/lib/stripe";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import Stripe from "stripe";
 import { MyApiRequest } from "@/pages/api/wallet";
-
+/*
+ * Get and create all subscription
+ */
 async function Subscription(req: MyApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     return await handlePost(req, res);

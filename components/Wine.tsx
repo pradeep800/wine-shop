@@ -1,3 +1,6 @@
+/*
+ * For 3d Wine shope model
+ */
 import { Canvas } from "@react-three/fiber";
 import Experience from "./Experience";
 export default function Wine() {

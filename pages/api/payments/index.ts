@@ -1,7 +1,7 @@
 import { decodeJWT } from "@/lib/decodeJWT";
 import { runAsync } from "@/lib/helper";
 import { createPaymentIntent } from "@/lib/stripeHelperFunction";
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 async function Payment(req: NextApiRequest, res: NextApiResponse) {
   let paymentIntent;
 

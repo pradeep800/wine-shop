@@ -10,6 +10,9 @@ export interface User {
   stripeCustomerId: string;
   uid: string;
 }
+/*
+ * For fetching user Info
+ */
 export function useUserData() {
   const [user] = useAuthState(auth);
   const setUserInfo = useStore((state) => state.setUserInfo);

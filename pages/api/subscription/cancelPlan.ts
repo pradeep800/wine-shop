@@ -4,11 +4,10 @@ import { runAsync, validateUser } from "@/lib/helper";
 import { stripe } from "@/lib/stripe";
 import { NextApiResponse } from "next";
 import { MyApiRequest } from "../wallet";
-
+/*
+ * for Canceling subscription plan
+ */
 async function HandleCancelPlan(req: MyApiRequest, res: NextApiResponse) {
-  const user = validateUser(req);
-  const uid = user.uid;
-  const customer = await getOrCreateCustomer(uid);
   const subscription = await stripe.subscriptions.del(req.body.subscriptionId);
   if (subscription.status === "canceled") {
     return subscription;

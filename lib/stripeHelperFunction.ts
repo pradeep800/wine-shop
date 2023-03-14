@@ -1,4 +1,5 @@
 import { stripe } from "./stripe";
+// For creating payment Intent
 export async function createPaymentIntent(
   amount: number,
   cardId: string,

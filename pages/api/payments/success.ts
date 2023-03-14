@@ -5,26 +5,29 @@ import { stripe } from "@/lib/stripe";
 import { NextApiResponse } from "next";
 import Stripe from "stripe";
 import { MyApiRequest } from "../wallet";
-
+//For Getting subscription and all payment history
 async function Success(req: MyApiRequest, res: NextApiResponse) {
   const user = validateUser(req);
   const { start_after } = req.body;
+  ///create or get customer detail
   let customer = await getOrCreateCustomer(user.uid);
   let params: Stripe.PaymentIntentListParams = {
     customer: customer.id,
+    limit: 20,
   };
 
   if (start_after) {
     params.starting_after = start_after;
   }
   try {
+    //get 20 payment history
     const successfulPayment = await stripe.paymentIntents.list(params);
-
+    ///get subscription
     const subscriptionPayment = await stripe.subscriptions.list({
       customer: customer.id,
     });
     let payments: any[] = [];
-
+    //traverse through successful payment and get their card detail
     for (const payment of successfulPayment.data) {
       if (payment.status === "succeeded") {
         let card = await stripe.paymentMethods.retrieve(

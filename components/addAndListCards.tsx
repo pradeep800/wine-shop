@@ -17,7 +17,10 @@ interface AllCardInfo {
   card: CardInfo;
   id: string;
 }
-export default function ListCreditCard() {
+/*
+ * This Component is use for Listing and Adding the cards
+ */
+export default function AddAndListCards() {
   /*
    * Using suspense for showing loading screen until everything load
    */

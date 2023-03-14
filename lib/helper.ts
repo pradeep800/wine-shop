@@ -3,6 +3,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { MyApiRequest } from "@/pages/api/wallet";
 import { User } from "firebase/auth";
 
+/*
+ * For fetching from api folder
+ */
 export async function FetchFromAPI(
   endpointURL: string,
   opts: {
@@ -38,17 +41,23 @@ export async function FetchFromAPI(
     throw Error("unable to process request");
   }
 }
+/*
+ * Whenever there is error in our api folder it will send "Server Error" message with 505 status
+ */
 export function runAsync(callback: Function) {
   return async (req: MyApiRequest | NextApiRequest, res: NextApiResponse) => {
     try {
       let a = await callback(req, res);
       res.send(a);
     } catch (err) {
-      res.status(500).json({ message: "Something went wrong" });
+      res.status(500).send("Server Error");
     }
   };
 }
 
+/*
+ * For validating User
+ */
 export function validateUser(req: MyApiRequest) {
   const user = req["currentUser"];
   if (!user) {

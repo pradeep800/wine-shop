@@ -1,25 +1,21 @@
 import { auth, db } from "@/lib/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { useEffect } from "react";
-import { useStore } from "@/lib/store";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import history from "@/static/images/history.png";
 import Image from "next/image";
 import Link from "next/link";
 import { useUserData } from "@/lib/useUserData";
 export function Nav() {
   const userInfo = useUserData();
+  /*
+   * For Signing out from google account
+   */
   async function SignOut() {
     await signOut(auth);
   }
+  /*
+   * For SignIn in google account
+   */
   async function SignInClick() {
     const provider = new GoogleAuthProvider();
     const { user } = await signInWithPopup(auth, provider);

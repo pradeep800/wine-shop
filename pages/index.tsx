@@ -15,7 +15,7 @@ export default function Home() {
     amount: state.amount,
     setAmount: state.setAmount,
   }));
-
+  // For showing error if there user is not login
   useEffect(() => {
     if (auth.currentUser) {
       setError(false);
@@ -23,9 +23,11 @@ export default function Home() {
       setError(true);
     }
   }, [userInfo]);
+  //for Incrementing amount of wine
   function Increment() {
     setAmount(amount + 1);
   }
+  //For decrementing amount of wine
   function Decrement() {
     setAmount(amount - 1);
   }

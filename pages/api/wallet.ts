@@ -8,7 +8,9 @@ export interface MyApiRequest extends NextApiRequest {
     uid: string;
   };
 }
-
+/*
+ * For getting and setting cards
+ */
 async function handler(req: MyApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     const user: User = validateUser(req);

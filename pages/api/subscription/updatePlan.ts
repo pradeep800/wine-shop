@@ -3,6 +3,9 @@ import { runAsync } from "@/lib/helper";
 import { MyApiRequest } from "../wallet";
 import { NextApiResponse } from "next";
 import { stripe } from "@/lib/stripe";
+/*
+ * For updating subscription plan
+ */
 async function HandleUpdatePlan(req: MyApiRequest, res: NextApiResponse) {
   let subscription;
   try {

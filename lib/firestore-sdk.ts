@@ -1,5 +1,8 @@
 import * as firebaseAdmin from "firebase-admin";
 import { ServiceAccount } from "firebase-admin";
+/*
+ * Credential
+ */
 let cred = {
   type: process.env.type,
   project_id: process.env.project_id,
@@ -14,6 +17,7 @@ let cred = {
   auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
   client_x509_cert_url: process.env.client_x509_cert_url,
 };
+
 const serviceAccount = Object.assign({}, cred) as ServiceAccount;
 const app = firebaseAdmin.apps.length
   ? firebaseAdmin.app()
@@ -21,6 +25,5 @@ const app = firebaseAdmin.apps.length
       credential: firebaseAdmin.credential.cert(serviceAccount),
     });
 
-// Now you can use Firebase services with the app reference
 export const db = app.firestore();
 export const auth = app.auth();

@@ -1,3 +1,6 @@
+/*
+ * Whenever Error Boundary cache error this page is shown
+ */
 export default function ErrorFallBack() {
   return (
     <div className="h-[100vh] flex justify-center items-center m-2">

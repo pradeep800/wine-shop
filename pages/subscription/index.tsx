@@ -3,7 +3,7 @@ import { useStore } from "@/lib/store";
 import { useStripe } from "@stripe/react-stripe-js";
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
-import useSWR, { mutate, useSWRConfig } from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import AuthCheck from "@/components/authCheck";
 import Loading from "@/components/loading";
 import Link from "next/link";

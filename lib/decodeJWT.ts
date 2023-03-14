@@ -1,6 +1,9 @@
 import { MyApiRequest } from "@/pages/api/wallet";
 import { NextApiHandler, NextApiResponse } from "next";
 import { auth } from "./firestore-sdk";
+/*
+ * For Decoding Jwt Token of firebase
+ */
 export function decodeJWT(handler: NextApiHandler) {
   return async (req: MyApiRequest, res: NextApiResponse) => {
     if (req.headers.authorization?.startsWith("Bearer ")) {

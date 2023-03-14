@@ -4,6 +4,9 @@ import { runAsync, validateUser } from "@/lib/helper";
 import { stripe } from "@/lib/stripe";
 import { NextApiResponse } from "next";
 import { MyApiRequest } from "../wallet";
+/*
+ * remove all subscription which have incomplete status
+ */
 async function Remove(req: MyApiRequest, res: NextApiResponse) {
   let uid = validateUser(req).uid;
   let customerId = (await getOrCreateCustomer(uid)).id;

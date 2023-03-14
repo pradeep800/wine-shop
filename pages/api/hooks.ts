@@ -18,6 +18,9 @@ type WebhookHandlers = {
   "customer.subscription.created": (data: Stripe.Subscription) => Promise<void>;
   "invoice.payment_failed": (data: Stripe.Invoice) => Promise<void>;
 };
+/*
+ * webhook for delete and create and failed invoice
+ */
 const webhookHandlers: WebhookHandlers = {
   "customer.subscription.deleted": async (data: Stripe.Subscription) => {
     const customer = (await stripe.customers.retrieve(

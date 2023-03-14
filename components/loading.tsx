@@ -1,3 +1,6 @@
+/*
+ * When something is loading This component is shown
+ */
 export default function Loading() {
   return (
     <div className="h-[80vh] flex justify-center items-center">
