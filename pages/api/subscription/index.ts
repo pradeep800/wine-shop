@@ -39,8 +39,6 @@ async function handlePost(req: MyApiRequest, res: NextApiResponse) {
         expand: ["latest_invoice.payment_intent"],
         default_payment_method: payment_method,
       });
-      const invoice = subscription.latest_invoice as Stripe.Invoice;
-      const payment_intent = invoice.payment_intent as Stripe.PaymentIntent;
       return subscription;
     } catch (err) {
       console.log(err);
