@@ -50,7 +50,7 @@ function Payment() {
     }
   );
   const router = useRouter();
-  const { cache } = useSWRConfig();
+  const { mutate } = useSWRConfig();
   const stripe = useStripe();
   const amount = useStore((state) => state.amount);
   const user = useStore((state) => state.userInfo);
@@ -60,10 +60,14 @@ function Payment() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     /*
-     * Whenever is destroyed delete the wallet information from cache
+     * Whenever is destroyed delete the every information from cache
      */
     return () => {
-      cache.delete(["wallet", { method: "GET" }]);
+      mutate(
+        (key) => true, // which cache keys are updated
+        undefined, // update cache data to `undefined`
+        { revalidate: false } // do not revalidate
+      );
     };
   }, [user]);
   // for creating intent

@@ -3,9 +3,7 @@ import EmptyHistory from "@/components/emptyHistory";
 import Loading from "@/components/loading";
 import { FetchFromAPI } from "@/lib/helper";
 import { FormEvent, Suspense, useEffect, useRef, useState } from "react";
-import Stripe from "stripe";
 import useSWR, { mutate, useSWRConfig } from "swr";
-import payments from "../api/payments";
 import { CardInfo } from "../subscription";
 interface Subscription {
   quantity: number;
@@ -24,7 +22,7 @@ interface FetchInterface {
   payments: PaymentHistory[];
   subscription: Subscription;
   start_after: string;
-  has_more?: string;
+  has_more?: boolean;
 }
 /*
  * For initial fetching
@@ -42,7 +40,9 @@ const fetcher = async (url: string) => {
 export default function AuthKart() {
   return (
     <AuthCheck>
-      <History />
+      <Suspense fallback={<Loading />}>
+        <History />
+      </Suspense>
     </AuthCheck>
   );
 }
@@ -69,32 +69,29 @@ const fetchMore = async (start_after: string) => {
   } as FetchInterface;
 };
 function History() {
-  const [hasMore, setHasMore] = useState<string>();
-  const [subscription, setSubscription] = useState<Subscription>();
-  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>();
-  const [startAfter, setStartAfter] = useState<string>();
+  const {
+    data: { subscription: sb, payments: pms, start_after: sf, has_more: hm },
+  } = useSWR<FetchInterface>("payments/success", fetcher, {
+    suspense: true,
+  });
+  const [hasMore, setHasMore] = useState<boolean>(hm as boolean);
+  const [subscription, setSubscription] = useState<Subscription | undefined>(
+    sb
+  );
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>(pms);
+  const [startAfter, setStartAfter] = useState<string>(sf);
   const [openEdit, setOpenEdit] = useState(false);
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [allLoading, setAllLoading] = useState(true);
-  /*
-   * For fetching initial detail like subscription, payment history and card details
-   */
+  const { mutate } = useSWRConfig();
   useEffect(() => {
-    (async () => {
-      const {
-        subscription: subscription,
-        payments,
-        start_after,
-        has_more,
-      } = await fetcher("/payments/success");
-
-      setSubscription(subscription);
-      setPaymentHistory(payments);
-      setStartAfter(start_after);
-      setAllLoading(false);
-      setHasMore(has_more);
-    })();
+    return () => {
+      mutate(
+        (key) => true, // which cache keys are updated
+        undefined, // update cache data to `undefined`
+        { revalidate: false } // do not revalidate
+      );
+    };
   }, []);
   /*
    * For Canceling subscription
@@ -133,10 +130,7 @@ function History() {
       alert("Unable to update");
     }
   };
-  // Show this Component until everything is fetched
-  if (allLoading) {
-    return <Loading />;
-  }
+
   //Whenever there is no Payment history and subscription it show no History
   if (JSON.stringify(paymentHistory) === "[]" && !subscription) {
     return <EmptyHistory />;
@@ -220,11 +214,13 @@ function History() {
                   {paymentHistory?.map((payment, index) => {
                     return (
                       <tr key={index} className="table-row hover:bg-slate-100 ">
-                        <td className="border-2 px-4 py-2">{index + 1}</td>
-                        <td className="border-2 px-4 py-2">
+                        <td className="border-2 px-4 py-2 font-light">
+                          {index + 1}
+                        </td>
+                        <td className="border-2 px-4 py-2 font-light">
                           {payment.amount / 100}
                         </td>
-                        <td className="border-2 px-4 py-2">
+                        <td className="border-2 px-4 py-2 font-light">
                           {
                             new Date(payment.created * 1000)
                               .toString()
@@ -233,7 +229,7 @@ function History() {
                               )?.[0]
                           }
                         </td>
-                        <td className="border-2 p-2">
+                        <td className="border-2 p-2 font-light">
                           {CreditCardToken({ card: payment.card })}
                         </td>
                       </tr>
@@ -257,7 +253,7 @@ function History() {
                       ...payments,
                     ]);
                     setStartAfter(start_after);
-                    setHasMore(has_more);
+                    setHasMore(has_more as boolean);
                     setLoading(false);
                   }
                 }}

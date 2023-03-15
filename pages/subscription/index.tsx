@@ -56,7 +56,7 @@ function SubscriptionHandler() {
   );
 
   const { subscription, wallet } = data || {};
-  const { cache } = useSWRConfig();
+  const { mutate } = useSWRConfig();
   const amount = useStore((state) => state.amount);
   const [selectedCard, setSelectedCard] = useState<string | null>(
     wallet.length ? wallet[0].id : null
@@ -68,7 +68,11 @@ function SubscriptionHandler() {
   const router = useRouter();
   useEffect(() => {
     return () => {
-      cache.delete(["wallet", { method: "GET" }]);
+      mutate(
+        (key) => true, // which cache keys are updated
+        undefined, // update cache data to `undefined`
+        { revalidate: false } // do not revalidate
+      );
     };
   }, [user]);
   async function subToSubscription() {

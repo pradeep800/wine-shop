@@ -1,11 +1,11 @@
 import { FetchFromAPI } from "@/lib/helper";
 import { useStore } from "@/lib/store";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Stripe from "stripe";
 import { StripeCardElement } from "@stripe/stripe-js";
 import { FormEvent } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import Loading from "./loading";
 interface CardInfo {
   last4: string;
@@ -50,7 +50,16 @@ function CreditCards() {
     Stripe.SetupIntent | undefined
   >();
   const [wallet, setWallet] = useState<AllCardInfo[]>(data);
-
+  const { mutate } = useSWRConfig();
+  useEffect(() => {
+    return () => {
+      mutate(
+        (key) => true, // which cache keys are updated
+        undefined, // update cache data to `undefined`
+        { revalidate: false } // do not revalidate
+      );
+    };
+  }, []);
   /*
    * For getting all the card which are attach to this account
    */

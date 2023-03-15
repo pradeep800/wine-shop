@@ -3,7 +3,7 @@
  */
 export default function ErrorFallBack() {
   return (
-    <div className="h-[100vh] flex justify-center items-center m-2">
+    <div className="h-[100vh] flex justify-center items-center p-3">
       <h1 className="text-slate-600 max-w-[500px] flex flex-col gap-3 text-xl ">
         {`We're sorry, but it seems like there's an internal error on our website.
         If you encounter this error, please try refreshing the page first to see
