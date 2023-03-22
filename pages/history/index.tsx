@@ -83,6 +83,9 @@ function History() {
   const [openEdit, setOpenEdit] = useState(false);
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const { mutate } = useSWRConfig();
   useEffect(() => {
     return () => {
@@ -97,12 +100,14 @@ function History() {
    * For Canceling subscription
    */
   async function cancel() {
+    setDeleting(true);
     await FetchFromAPI("subscription/cancelPlan", {
       body: {
         subscriptionId: subscription?.id as string,
       },
     });
     setSubscription(undefined);
+    setDeleting(false);
     alert("Cancel Successful");
   }
   /*
@@ -110,6 +115,7 @@ function History() {
    */
   const saveUpdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setEditing(true);
     try {
       await FetchFromAPI("subscription/updatePlan", {
         method: "POST",
@@ -129,6 +135,7 @@ function History() {
     } catch (err) {
       alert("Unable to update");
     }
+    setEditing(false);
   };
 
   //Whenever there is no Payment history and subscription it show no History
@@ -157,7 +164,7 @@ function History() {
                     setOpenEdit(true);
                   }}
                 >
-                  edit
+                  {editing ? "editing..." : "edit"}
                 </span>
                 <span
                   className="bg-slate-300 p-2 rounded hover:bg-slate-400"
@@ -170,7 +177,7 @@ function History() {
                     }
                   }}
                 >
-                  delete
+                  {deleting ? "deleting..." : "deleting"}
                 </span>
               </div>
               {openEdit && (
