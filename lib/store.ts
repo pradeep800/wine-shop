@@ -14,7 +14,7 @@ const store = (set: any): StoreInfo => ({
   userInfo: null, //for user info
   setUserInfo: (info) => {
     //for setting user info
-    set((state: StoreInfo) => ({
+    set(() => ({
       userInfo: info,
     }));
   },
@@ -22,7 +22,7 @@ const store = (set: any): StoreInfo => ({
   setAmount: (newAmount) => {
     //for setting amount of wine
     if (newAmount >= 1) {
-      set((state: StoreInfo) => ({ amount: newAmount }));
+      set(() => ({ amount: newAmount }));
     }
   },
 });

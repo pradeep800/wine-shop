@@ -72,7 +72,7 @@ async function Success(req: MyApiRequest, res: NextApiResponse) {
           ? subscriptionData[0]
           : undefined,
       start_after: payments[payments.length - 1]?.id,
-      has_more: has_more as boolean,
+      has_more: has_more,
     };
     return result;
   } catch (err) {

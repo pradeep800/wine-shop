@@ -41,6 +41,7 @@ export async function FetchFromAPI(
     throw Error("unable to process request");
   }
 }
+
 /*
  * Whenever there is error in our api folder it will send "Server Error" message with 505 status
  */

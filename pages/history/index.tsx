@@ -148,7 +148,7 @@ function History() {
               </div>
               <div className="flex justify-around">
                 <span
-                  className="p-2 bg-green-400 hover:bg-green-300 rounded"
+                  className="p-2 bg-slate-400 hover:bg-slate-300 rounded"
                   onClick={() => {
                     if (openEdit) {
                       setOpenEdit(false);
@@ -160,7 +160,7 @@ function History() {
                   edit
                 </span>
                 <span
-                  className="bg-red-400 p-2 rounded hover:bg-red-300"
+                  className="bg-slate-300 p-2 rounded hover:bg-slate-400"
                   onClick={() => {
                     let really = confirm(
                       "Do you Really want to cancel This subscription?"
