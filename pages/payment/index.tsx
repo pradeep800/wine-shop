@@ -118,7 +118,7 @@ function Payment() {
   }
   return (
     <div className=" flex h-[80vh] justify-center items-center">
-      <div className="flex flex-col justify-center items-center gap-3 border-2 border-black border-solid p-4 sm:p-2 sm:pt-5">
+      <div className="flex flex-col justify-center items-center gap-3 border-2 border-black border-solid p-4 sm:p-2 sm:pt-5 min-h-[400px]">
         <Image
           alt="image of product"
           src="/static/images/winePhoto.jpeg"
