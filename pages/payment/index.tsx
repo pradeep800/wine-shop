@@ -122,7 +122,7 @@ function Payment() {
         <Image
           alt="image of product"
           src="/static/images/winePhoto.jpeg"
-          height={100}
+          height={341}
           width={300}
         />
         <div>
