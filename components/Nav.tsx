@@ -70,12 +70,12 @@ export function Nav() {
             </Link>
           </div>
         ) : (
-          <div
+          <button
             onClick={SignInClick}
             className="ml-auto p-2 border-black border-2 hover:bg-slate-200  rounded   "
           >
             Login
-          </div>
+          </button>
         )}
       </div>
     </nav>
