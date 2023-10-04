@@ -39,7 +39,7 @@ export function Nav() {
     <nav className="">
       <div className="flex items-center   ">
         <Link href={"/"}>
-          <div className="text-2xl font-bold">Wine</div>
+          <div className="text-2xl font-bold cursor-pointer">Wine</div>
         </Link>
 
         {userInfo?.uid ? (
